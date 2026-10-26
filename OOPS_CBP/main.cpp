@@ -140,6 +140,39 @@ public:
         }
     }
 
+    bool updateQuantity(const std::string& id, int newQuantity) {
+        if (newQuantity < 0) {
+            std::cout << "Error: Quantity cannot be negative." << std::endl;
+            return false;
+        }
+
+        auto component = findById(id);
+        if (!component) {
+            std::cout << "Error: Component with ID '" << id << "' not found." << std::endl;
+            return false;
+        }
+
+        component->setQuantity(newQuantity);
+        std::cout << "Successfully updated stock quantity for component ID '" << id << "' to " << newQuantity << "." << std::endl;
+        return true;
+    }
+
+    bool removeComponent(const std::string& id) {
+        auto it = std::remove_if(components.begin(), components.end(),
+            [&id](const std::shared_ptr<Component>& component) {
+                return component->getId() == id;
+            });
+
+        if (it == components.end()) {
+            std::cout << "Error: Component with ID '" << id << "' not found." << std::endl;
+            return false;
+        }
+
+        components.erase(it, components.end());
+        std::cout << "Successfully removed component with ID '" << id << "' from inventory." << std::endl;
+        return true;
+    }
+
     [[nodiscard]] std::shared_ptr<Component> findById(const std::string& id) const {
         for (const auto& component : components) {
             if (component->getId() == id) {
@@ -171,20 +204,97 @@ public:
     }
 };
 
+// Structure representing an item inside a specific project bill of materials
+struct ProjectItem {
+    std::shared_ptr<Component> component;
+    int requiredQuantity;
+
+    double getLineTotal() const {
+        return component->getPrice() * requiredQuantity;
+    }
+};
+
+// Robotics Project / Cost Estimator Class (Phase 1 Sub-step 4 & 5)
+class RoboticsProject {
+    std::string projectName;
+    std::vector<ProjectItem> items;
+
+public:
+    RoboticsProject(const std::string& name = "Custom Robot Build") : projectName(name) {}
+
+    void setProjectName(const std::string& name) { projectName = name; }
+    std::string getProjectName() const { return projectName; }
+
+    bool addItem(std::shared_ptr<Component> component, int requiredQty) {
+        if (!component) return false;
+
+        if (requiredQty <= 0) {
+            std::cout << "Error: Required quantity must be greater than 0." << std::endl;
+            return false;
+        }
+
+        if (requiredQty > component->getQuantity()) {
+            std::cout << "Error: Insufficient inventory stock for '" << component->getName() 
+                      << "'. Requested: " << requiredQty 
+                      << ", Available Stock: " << component->getQuantity() << std::endl;
+            return false;
+        }
+
+        items.push_back({component, requiredQty});
+        std::cout << "Added " << requiredQty << "x '" << component->getName() 
+                  << "' to project '" << projectName << "'." << std::endl;
+        return true;
+    }
+
+    [[nodiscard]] double calculateEstimatedCost() const {
+        double total = 0.0;
+        for (const auto& item : items) {
+            total += item.getLineTotal();
+        }
+        return total;
+    }
+
+    void displayProjectSummary() const {
+        if (items.empty()) {
+            std::cout << "\nProject '" << projectName << "' currently has no components assigned." << std::endl;
+            return;
+        }
+
+        std::cout << "\n=========================================================" << std::endl;
+        std::cout << " PROJECT BILL OF MATERIALS & COST QUOTE: " << projectName << std::endl;
+        std::cout << "=========================================================" << std::endl;
+        for (const auto& item : items) {
+            std::cout << "Item: " << item.component->getName()
+                      << " (ID: " << item.component->getId() << ")"
+                      << " | Unit Price: $" << std::fixed << std::setprecision(2) << item.component->getPrice()
+                      << " | Required Qty: " << item.requiredQuantity
+                      << " | Line Total: $" << item.getLineTotal() << std::endl;
+        }
+        std::cout << "---------------------------------------------------------" << std::endl;
+        std::cout << "ESTIMATED TOTAL BUILD COST: $" << std::fixed << std::setprecision(2) << calculateEstimatedCost() << std::endl;
+        std::cout << "=========================================================\n" << std::endl;
+    }
+};
+
 // Command-Line Interface Driver
 int main() {
     Inventory inventory;
+    RoboticsProject currentProject("Autonomous Mobile Robot (AMR)");
     int choice = 0;
 
     do {
         std::cout << "\n=== ROBOTICS COMPONENT INVENTORY MANAGEMENT SYSTEM ===" << std::endl;
-        std::cout << "1. Add Component" << std::endl;
+        std::cout << "1. Add Component to Inventory" << std::endl;
         std::cout << "2. Display All Components" << std::endl;  
         std::cout << "3. Search Component by ID" << std::endl;
         std::cout << "4. Search Component by Name" << std::endl;
-        std::cout << "5. Calculate Total Inventory Valuation" << std::endl;
-        std::cout << "6. Exit" << std::endl;
-        std::cout << "Enter your choice (1-6): ";
+        std::cout << "5. Update Component Stock" << std::endl;
+        std::cout << "6. Remove Component from Inventory" << std::endl;
+        std::cout << "7. Calculate Total Inventory Valuation" << std::endl;
+        std::cout << "8. Add Component to Robotics Project Build" << std::endl;
+        std::cout << "9. Display Robotics Project Bill of Materials & Quote" << std::endl;
+        std::cout << "10. Exit" << std::endl;
+        std::cout << "Enter your choice (1-10): ";
         std::cin >> choice;
 
         switch (choice) {
@@ -216,10 +326,9 @@ int main() {
                 std::shared_ptr<Component> newComponent = nullptr;
 
                 switch (typeChoice) {
-                    case 1: {
+                    case 1:
                         newComponent = std::make_shared<Component>(name, id, price, quantity);
                         break;
-                    }
                     case 2: {
                         int voltage = 0, rpm = 0;
                         std::cout << "Enter Operating Voltage (V): ";
@@ -308,21 +417,57 @@ int main() {
                 }
                 break;
             }
-            case 5:
+            case 5: {
+                std::string id;
+                int newQuantity = 0;
+                std::cout << "Enter Component ID to update stock: ";
+                std::cin >> id;
+                std::cout << "Enter New Stock Quantity: ";
+                std::cin >> newQuantity;
+                inventory.updateQuantity(id, newQuantity);
+                break;
+            }
+            case 6: {
+                std::string id;
+                std::cout << "Enter Component ID to remove: ";
+                std::cin >> id;
+                inventory.removeComponent(id);
+                break;
+            }
+            case 7:
                 std::cout << "\nTotal Valuation of Current Stock: $" 
                           << std::fixed << std::setprecision(2) 
                           << inventory.calculateTotalInventoryValue() << std::endl;
                 break;
 
-            case 6:
+            case 8: {
+                std::string id;
+                int reqQty = 0;
+                std::cout << "Enter Component ID to add to project build: ";
+                std::cin >> id;
+                auto comp = inventory.findById(id);
+                if (!comp) {
+                    std::cout << "Error: Component with ID '" << id << "' not found in inventory." << std::endl;
+                } else {
+                    std::cout << "Enter Required Quantity for Project: ";
+                    std::cin >> reqQty;
+                    currentProject.addItem(comp, reqQty);
+                }
+                break;
+            }
+            case 9:
+                currentProject.displayProjectSummary();
+                break;
+
+            case 10:
                 std::cout << "Exiting system. Goodbye!" << std::endl;
                 return 0;
 
             default:
-                std::cout << "Invalid option selected. Please choose between 1 and 6." << std::endl;
+                std::cout << "Invalid option selected. Please choose between 1 and 10." << std::endl;
                 break;
         }
-    } while (choice != 6);
+    } while (choice != 10);
 
     return 0;
 }
