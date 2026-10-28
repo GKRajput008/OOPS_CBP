@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robotics Laboratory ERP & BOM Cost Estimator | OOPS CBP</title>
+    <meta name="description" content="Object-Oriented Robotics Components Inventory Management System and Project Bill of Materials (BOM) Cost Estimator. Complete with polymorphic hardware classification and CSV persistence.">
+    <!-- Google Fonts: Inter & Outfit & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- App Container -->
+    <div id="app" class="app-layout">
+        <!-- Top Navigation / Header -->
+        <header class="app-header">
+            <div class="header-brand">
+                <div class="brand-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                        <circle cx="12" cy="5" r="2"></circle>
+                        <path d="M12 7v4"></path>
+                        <line x1="8" y1="16" x2="8" y2="16"></line>
+                        <line x1="16" y1="16" x2="16" y2="16"></line>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="brand-title">ROBOTICS LAB ERP & BOM ESTIMATOR</h1>
+                    <p class="brand-subtitle">Course Based Project (OOPS CBP) • C++ Polymorphic Hardware System</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <div class="system-status-pill">
+                    <span class="status-indicator"></span>
+                    <span id="systemStatusText">OOP C++ Core Synced</span>
+                </div>
+                <button id="btnOopGuide" class="btn btn-outline" title="View OOPS Architecture & Viva Concept Guide">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <span>OOP Concepts Guide</span>
+                </button>
+                <button id="btnResetData" class="btn btn-ghost" title="Reset to Sample Hardware Inventory">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                        <path d="M21 3v5h-5"></path>
+                        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                        <path d="M3 21v-5h5"></path>
+                    </svg>
+                    <span>Reset Data</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="tab-navigation">
+            <button class="nav-tab active" data-tab="tabDashboard" id="tabNavDashboard">
+                <span class="tab-icon">📊</span>
+                <span>Dashboard & Analytics</span>
+            </button>
+            <button class="nav-tab" data-tab="tabCatalog" id="tabNavCatalog">
+                <span class="tab-icon">📦</span>
+                <span>Hardware Catalog</span>
+                <span id="badgeCatalogCount" class="tab-badge">17</span>
+            </button>
+            <button class="nav-tab" data-tab="tabBOM" id="tabNavBOM">
+                <span class="tab-icon">🤖</span>
+                <span>Project BOM & Cost Estimator</span>
+                <span id="badgeBomCount" class="tab-badge">0</span>
+            </button>
+            <button class="nav-tab" data-tab="tabPersistence" id="tabNavPersistence">
+                <span class="tab-icon">💾</span>
+                <span>CSV Persistence & I/O</span>
+            </button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="app-main">
+            <!-- TAB 1: DASHBOARD & ANALYTICS -->
+            <section id="tabDashboard" class="tab-content active">
+                <!-- KPI Indicators Grid -->
+                <div class="kpi-grid">
+                    <div class="kpi-card accent-cyan">
+                        <div class="kpi-header">
+                            <span class="kpi-label">TOTAL INVENTORY VALUATION</span>
+                            <span class="kpi-icon">💰</span>
+                        </div>
+                        <div id="kpiTotalValuation" class="kpi-value">$0.00</div>
+                        <p class="kpi-caption">Calculated via polymorphic Unit Price × In-Stock Quantity</p>
+                    </div>
+
+                    <div class="kpi-card accent-indigo">
+                        <div class="kpi-header">
+                            <span class="kpi-label">UNIQUE HARDWARE SKUs</span>
+                            <span class="kpi-icon">🏷️</span>
+                        </div>
+                        <div id="kpiUniqueSkus" class="kpi-value">0</div>
+                        <p class="kpi-caption">Distinct components registered in Polymorphic Collection</p>
+                    </div>
+
+                    <div class="kpi-card accent-emerald">
+                        <div class="kpi-header">
+                            <span class="kpi-label">TOTAL PHYSICAL UNITS</span>
+                            <span class="kpi-icon">📦</span>
+                        </div>
+                        <div id="kpiTotalUnits" class="kpi-value">0</div>
+                        <p class="kpi-caption">Aggregate warehouse parts available for robot builds</p>
+                    </div>
+
+                    <div class="kpi-card accent-rose">
+                        <div class="kpi-header">
+                            <span class="kpi-label">LOW STOCK SHORTAGES</span>
+                            <span class="kpi-icon">⚠️</span>
+                        </div>
+                        <div id="kpiLowStockCount" class="kpi-value">0</div>
+                        <p class="kpi-caption">Components below critical reserve threshold (&le; 10 units)</p>
+                    </div>
+                </div>
+
+                <!-- Dashboard Secondary Section: Category Breakdown + Low Stock Alerts -->
+                <div class="dashboard-split">
+                    <!-- Category Breakdown -->
+                    <div class="card glass-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Hardware Category Distribution</h2>
+                            <span class="card-tag">Polymorphic Subclasses</span>
+                        </div>
+                        <div id="categoryBreakdownList" class="category-list">
+                            <!-- Injected by app.js -->
+                        </div>
+                    </div>
+
+                    <!-- Low Stock Alerts Panel -->
+                    <div class="card glass-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Critical Shortage Radar (&le; 10 Units)</h2>
+                            <span class="badge badge-warning">Priority Action</span>
+                        </div>
+                        <div class="table-container compact">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Component</th>
+                                        <th>Category</th>
+                                        <th>Stock</th>
+                                        <th>Status</th>
+                                        <th>Quick Restock</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lowStockTableBody">
+                                    <!-- Injected by app.js -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: HARDWARE CATALOG -->
+            <section id="tabCatalog" class="tab-content">
+                <!-- Toolbar -->
+                <div class="catalog-toolbar">
+                    <div class="search-box">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="catalogSearchInput" placeholder="Search by name, ID, category, or specs...">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="filterCategorySelect" class="filter-label">Category:</label>
+                        <select id="filterCategorySelect" class="select-input">
+                            <option value="All">All Categories</option>
+                            <option value="Motor">Motors</option>
+                            <option value="Sensor">Sensors</option>
+                            <option value="Controller">Controllers</option>
+                            <option value="Battery">Batteries</option>
+                            <option value="Converter">Converters</option>
+                            <option value="Generic">Generic Parts</option>
+                        </select>
+                    </div>
+
+                    <button id="btnOpenAddModal" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        <span>Add Component</span>
+                    </button>
+                </div>
+
+                <!-- Catalog Data Table -->
+                <div class="card glass-card">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Hardware Name</th>
+                                    <th>Component ID</th>
+                                    <th>Polymorphic Specifications</th>
+                                    <th>Unit Price</th>
+                                    <th>In Stock</th>
+                                    <th>Total Val</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="catalogTableBody">
+                                <!-- Injected by app.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: ROBOTICS PROJECT BOM & COST ESTIMATOR -->
+            <section id="tabBOM" class="tab-content">
+                <!-- Project Configuration Bar -->
+                <div class="bom-config-bar card glass-card">
+                    <div class="config-field">
+                        <label for="inputProjectName" class="config-label">Robotics Project Name:</label>
+                        <input type="text" id="inputProjectName" class="text-input" value="Autonomous Mobile Robot (AMR-01)">
+                    </div>
+                    <div class="config-field small">
+                        <label for="inputTaxRate" class="config-label">Tax Rate (%):</label>
+                        <input type="number" id="inputTaxRate" class="number-input" value="8.25" min="0" max="40" step="0.25">
+                    </div>
+                    <div class="config-field small">
+                        <label for="inputShippingCost" class="config-label">Shipping / Freight ($):</label>
+                        <input type="number" id="inputShippingCost" class="number-input" value="15.00" min="0" max="500" step="1">
+                    </div>
+                    <div class="config-actions">
+                        <button id="btnClearBom" class="btn btn-danger-outline" title="Clear Bill of Materials">Clear BOM</button>
+                    </div>
+                </div>
+
+                <div class="bom-workspace-grid">
+                    <!-- Left: Allocation Controller -->
+                    <div class="card glass-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Allocate Hardware to Build</h2>
+                            <span class="card-tag">Stock Bounded</span>
+                        </div>
+
+                        <div class="bom-add-form">
+                            <div class="form-group">
+                                <label for="selectBomComponent" class="form-label">Select Inventory Component:</label>
+                                <select id="selectBomComponent" class="select-input">
+                                    <!-- Injected by app.js -->
+                                </select>
+                            </div>
+
+                            <div class="stock-preview-box" id="stockPreviewBox">
+                                <div class="stock-info-row">
+                                    <span class="text-muted">Available in Inventory:</span>
+                                    <span id="bomSelectedStock" class="stock-pill">0 units</span>
+                                </div>
+                                <div class="stock-info-row">
+                                    <span class="text-muted">Unit Catalog Price:</span>
+                                    <span id="bomSelectedPrice" class="price-pill">$0.00</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="inputBomQuantity" class="form-label">Required Quantity:</label>
+                                <div class="qty-stepper">
+                                    <button type="button" class="btn-step" id="btnBomQtyDec">-</button>
+                                    <input type="number" id="inputBomQuantity" class="number-input text-center" value="1" min="1">
+                                    <button type="button" class="btn-step" id="btnBomQtyInc">+</button>
+                                </div>
+                            </div>
+
+                            <button id="btnAddToBom" class="btn btn-primary full-width">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                <span>Add to Project BOM</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right: Itemized BOM Table & Financial Summary -->
+                    <div class="card glass-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Bill of Materials & Line Totals</h2>
+                            <button id="btnExportInvoiceTxt" class="btn btn-secondary-sm">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                <span>Export TXT Invoice</span>
+                            </button>
+                        </div>
+
+                        <div class="table-container compact">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Component</th>
+                                        <th>Category</th>
+                                        <th>Unit Price</th>
+                                        <th>Allocated Qty</th>
+                                        <th>Line Total</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bomTableBody">
+                                    <!-- Injected by app.js -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Financial Summary Breakdown -->
+                        <div class="financial-summary-panel">
+                            <div class="financial-row">
+                                <span class="financial-label">Subtotal (Components Cost):</span>
+                                <span id="bomSubtotal" class="financial-val">$0.00</span>
+                            </div>
+                            <div class="financial-row">
+                                <span id="bomTaxLabel" class="financial-label">Estimated Sales Tax (8.25%):</span>
+                                <span id="bomTax" class="financial-val">$0.00</span>
+                            </div>
+                            <div class="financial-row">
+                                <span class="financial-label">Logistics & Shipping:</span>
+                                <span id="bomShipping" class="financial-val">$15.00</span>
+                            </div>
+                            <div class="financial-divider"></div>
+                            <div class="financial-row total-highlight">
+                                <span class="financial-label grand">GRAND TOTAL ESTIMATED BUILD COST:</span>
+                                <span id="bomGrandTotal" class="financial-val grand">$15.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: CSV PERSISTENCE & FILE I/O -->
+            <section id="tabPersistence" class="tab-content">
+                <div class="persistence-actions-bar card glass-card">
+                    <div class="file-action-buttons">
+                        <button id="btnDownloadCsv" class="btn btn-success">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            <span>Download Updated inventory.csv</span>
+                        </button>
+
+                        <label for="csvFileInput" class="btn btn-secondary cursor-pointer">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <span>Upload / Import Custom CSV</span>
+                            <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+                        </label>
+
+                        <button id="btnCopyCsv" class="btn btn-ghost">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            <span>Copy CSV to Clipboard</span>
+                        </button>
+                    </div>
+
+                    <div class="file-meta-info">
+                        <span class="text-muted">Compatible with C++ Core:</span>
+                        <code class="code-badge">OOPS_CBP/inventory.csv</code>
+                    </div>
+                </div>
+
+                <!-- Live Stream Visualizer -->
+                <div class="streams-split">
+                    <!-- CSV Stream Inspector -->
+                    <div class="card glass-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Live CSV Data Stream</h2>
+                            <span class="card-tag">RFC 4180 Serialization</span>
+                        </div>
+                        <pre id="csvStreamViewer" class="code-viewer"></pre>
+                    </div>
+
+                    <!-- TXT Invoice Receipt Inspector -->
+                    <div class="card glass-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Live Project Invoice Preview</h2>
+                            <span class="card-tag">Official Build Quote</span>
+                        </div>
+                        <pre id="invoiceStreamViewer" class="code-viewer receipt-font"></pre>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Status Bar -->
+        <footer class="app-footer">
+            <div class="footer-left">
+                <span id="footerStatusMsg" class="status-msg">System operational. 17 polymorphic components loaded.</span>
+            </div>
+            <div class="footer-right">
+                <span class="clock-display" id="footerClock">🕒 2026-10-27 19:40:00</span>
+                <span class="badge badge-subtle">C++17 & Python & Web Triple-Stack</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- MODAL: ADD NEW COMPONENT (POLYMORPHIC DYNAMIC FORM) -->
+    <div id="modalAddComponent" class="modal-backdrop">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">Add Hardware Component</h2>
+                    <p class="modal-subtitle">Polymorphic parameter mapping for C++ inheritance hierarchy</p>
+                </div>
+                <button id="btnCloseModal" class="btn-close" aria-label="Close modal">&times;</button>
+            </div>
+
+            <form id="formAddComponent" class="modal-body">
+                <!-- Category Selector -->
+                <div class="form-group">
+                    <label for="modalSelectCategory" class="form-label">Component Category *:</label>
+                    <select id="modalSelectCategory" class="select-input">
+                        <option value="Motor">Motor (Operating Voltage, Max RPM)</option>
+                        <option value="Sensor">Sensor (Sensor Category, Detection Range)</option>
+                        <option value="Controller">Controller (Architecture, I/O Ports)</option>
+                        <option value="Battery">Battery (Capacity mAh, Chemistry)</option>
+                        <option value="Converter">Converter (Input Voltage, Output Voltage)</option>
+                        <option value="Generic">Generic Hardware</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-2">
+                        <label for="modalInputName" class="form-label">Component Name *:</label>
+                        <input type="text" id="modalInputName" class="text-input" placeholder="e.g. NEMA 17 Stepper Motor" required>
+                    </div>
+                    <div class="form-group flex-1">
+                        <label for="modalInputId" class="form-label">Component ID *:</label>
+                        <input type="text" id="modalInputId" class="text-input uppercase" placeholder="e.g. MOT-004" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label for="modalInputPrice" class="form-label">Unit Price ($) *:</label>
+                        <input type="number" id="modalInputPrice" class="number-input" placeholder="0.00" min="0.01" step="0.01" required>
+                    </div>
+                    <div class="form-group flex-1">
+                        <label for="modalInputQuantity" class="form-label">Initial Stock *:</label>
+                        <input type="number" id="modalInputQuantity" class="number-input" placeholder="10" min="0" step="1" required>
+                    </div>
+                </div>
+
+                <!-- Dynamic Polymorphic Specific Fields -->
+                <div class="dynamic-specs-section">
+                    <h3 class="section-subtitle">Subclass Specifications</h3>
+
+                    <!-- Motor Fields -->
+                    <div id="subclassMotor" class="subclass-fields active">
+                        <div class="form-row">
+                            <div class="form-group flex-1">
+                                <label for="motorVoltage" class="form-label">Operating Voltage (V):</label>
+                                <input type="number" id="motorVoltage" class="number-input" placeholder="12" value="12">
+                            </div>
+                            <div class="form-group flex-1">
+                                <label for="motorRpm" class="form-label">Max RPM:</label>
+                                <input type="number" id="motorRpm" class="number-input" placeholder="1200" value="1200">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sensor Fields -->
+                    <div id="subclassSensor" class="subclass-fields">
+                        <div class="form-row">
+                            <div class="form-group flex-1">
+                                <label for="sensorType" class="form-label">Sensor Technology:</label>
+                                <input type="text" id="sensorType" class="text-input" placeholder="e.g. Optical, Ultrasonic, IMU" value="Optical">
+                            </div>
+                            <div class="form-group flex-1">
+                                <label for="sensorRange" class="form-label">Range (meters):</label>
+                                <input type="number" id="sensorRange" class="number-input" placeholder="10.0" step="0.1" value="5.0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Controller Fields -->
+                    <div id="subclassController" class="subclass-fields">
+                        <div class="form-row">
+                            <div class="form-group flex-1">
+                                <label for="ctlArch" class="form-label">Processor Architecture:</label>
+                                <input type="text" id="ctlArch" class="text-input" placeholder="e.g. ARM Cortex-M4, AVR" value="ARM Cortex-M4">
+                            </div>
+                            <div class="form-group flex-1">
+                                <label for="ctlPorts" class="form-label">Total I/O Ports:</label>
+                                <input type="number" id="ctlPorts" class="number-input" placeholder="16" value="16">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Battery Fields -->
+                    <div id="subclassBattery" class="subclass-fields">
+                        <div class="form-row">
+                            <div class="form-group flex-1">
+                                <label for="batCapacity" class="form-label">Capacity (mAh):</label>
+                                <input type="number" id="batCapacity" class="number-input" placeholder="5000" value="5000">
+                            </div>
+                            <div class="form-group flex-1">
+                                <label for="batChem" class="form-label">Chemistry Type:</label>
+                                <input type="text" id="batChem" class="text-input" placeholder="e.g. LiPo, Li-Ion, LiFePO4" value="LiPo">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Converter Fields -->
+                    <div id="subclassConverter" class="subclass-fields">
+                        <div class="form-row">
+                            <div class="form-group flex-1">
+                                <label for="cnvInputV" class="form-label">Input Voltage (V):</label>
+                                <input type="number" id="cnvInputV" class="number-input" placeholder="36.0" step="0.1" value="36.0">
+                            </div>
+                            <div class="form-group flex-1">
+                                <label for="cnvOutputV" class="form-label">Regulated Output (V):</label>
+                                <input type="number" id="cnvOutputV" class="number-input" placeholder="5.0" step="0.1" value="5.0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Generic Fields -->
+                    <div id="subclassGeneric" class="subclass-fields">
+                        <p class="text-muted text-sm">Generic hardware requires no specialized physical parameters.</p>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="btnCancelModal" class="btn btn-ghost">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save to Catalog</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: OOP CONCEPTS & VIVA GUIDE -->
+    <div id="modalOopGuide" class="modal-backdrop">
+        <div class="modal-card wide">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">Object-Oriented Programming (OOPS) Architecture</h2>
+                    <p class="modal-subtitle">Direct mapping of C++ OOP concepts implemented in main.cpp for CBP Project Viva</p>
+                </div>
+                <button id="btnCloseOopGuide" class="btn-close">&times;</button>
+            </div>
+            <div class="modal-body scrollable">
+                <div class="oop-grid">
+                    <div class="oop-card">
+                        <div class="oop-badge">Pillar 1</div>
+                        <h3>Encapsulation & Data Hiding</h3>
+                        <p>Private/protected state variables (<code>name</code>, <code>id</code>, <code>price</code>, <code>quantity</code>) accessible only through validated getters and setters (e.g., non-negative quantity checks).</p>
+                        <code class="code-snippet">Component(name, id, price, qty);
+void setQuantity(int q); // validates q >= 0</code>
+                    </div>
+
+                    <div class="oop-card">
+                        <div class="oop-badge">Pillar 2</div>
+                        <h3>Hierarchical Inheritance</h3>
+                        <p>Specialized hardware categories inherit from <code>Component</code> base class, extending functionality with domain parameters (e.g., Motor adds RPM, Battery adds mAh).</p>
+                        <code class="code-snippet">class Motor : public Component {
+    int operatingVoltage; int rpm;
+};</code>
+                    </div>
+
+                    <div class="oop-card">
+                        <div class="oop-badge">Pillar 3</div>
+                        <h3>Runtime Polymorphism</h3>
+                        <p>Virtual methods (<code>display()</code>, <code>getType()</code>, <code>toCSV()</code>) dynamically dispatched at runtime via base class pointers (<code>std::shared_ptr&lt;Component&gt;</code>).</p>
+                        <code class="code-snippet">virtual void display() const;
+virtual std::string getType() const;
+virtual ~Component() = default;</code>
+                    </div>
+
+                    <div class="oop-card">
+                        <div class="oop-badge">Pillar 4</div>
+                        <h3>Abstraction & Stream I/O</h3>
+                        <p>Complex CSV parsing, tokenization, stock reservation validation, and invoice formatting are encapsulated in <code>Inventory</code> and <code>RoboticsProject</code> classes.</p>
+                        <code class="code-snippet">inventory.loadFromCSV("inventory.csv");
+currentProject.exportReceiptTXT("receipt.txt");</code>
+                    </div>
+                </div>
+
+                <div class="viva-tips-box">
+                    <h4>💡 Quick Tips for Course Project Evaluation:</h4>
+                    <ul>
+                        <li><strong>Run Terminal:</strong> Run <code>.\main.exe</code> to demonstrate the student-friendly C++ console menu.</li>
+                        <li><strong>Run Desktop GUI:</strong> Run <code>py main.py</code> to show the full PyQt6 visual dashboard.</li>
+                        <li><strong>Run Web App:</strong> Open <code>index.html</code> directly in any web browser for zero-install demonstrations.</li>
+                        <li><strong>Persistence:</strong> Notice how changes in any interface synchronize via the shared <code>inventory.csv</code> schema!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

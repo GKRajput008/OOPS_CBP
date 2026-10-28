@@ -1,0 +1,17 @@
+Motor,NEMA 17 Stepper Motor,MOT-001,14.500000,25,12,1200
+Motor,DC Planetary Gearmotor 12V,MOT-002,28.750000,8,12,350
+Motor,Brushless Outrunner 920KV,MOT-003,19.990000,14,11,10000
+Sensor,RPLIDAR A1M8 360 Lidar,SEN-001,99.000000,5,Optical/Laser,12.000000
+Sensor,HC-SR04 Ultrasonic Sensor,SEN-002,3.250000,45,Ultrasonic,4.000000
+Sensor,BNO055 9-DOF IMU Sensor,SEN-003,34.500000,12,Inertial,1.500000
+Controller,STM32F407G Discovery Board,CTL-001,24.900000,10,ARM Cortex-M4,16
+Controller,Raspberry Pi 4 Model B (4GB),CTL-002,55.000000,6,ARM Cortex-A72,40
+Controller,Arduino Mega 2560 Rev3,CTL-003,38.500000,15,AVR RISC,54
+Battery,Turnigy LiPo 3S 5000mAh,BAT-001,42.000000,10,5000,LiPo
+Battery,Panasonic 18650 Li-ion Cell,BAT-002,6.500000,60,3500,Li-Ion
+Battery,LiFePO4 12V 10Ah Deep Cycle,BAT-003,89.000000,3,10000,LiFePO4
+Converter,LM2596 Buck Step-Down Module,CNV-001,2.800000,50,40.000000,1.250000
+Converter,XL6009 Boost Step-Up Module,CNV-002,3.400000,30,32.000000,35.000000
+Converter,Pololu 5V 5A Step-Down D24V50F5,CNV-003,16.950000,7,38.000000,5.000000
+Generic,M3 Standoff Hardware Kit,GEN-001,8.990000,18
+Generic,Aluminum Extrusion 2020 500mm,GEN-002,11.200000,22

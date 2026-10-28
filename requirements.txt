@@ -1,0 +1,3 @@
+# Robotics Components Inventory Management System - Phase 4 GUI
+# Python Dependencies
+PyQt6>=6.6.0
